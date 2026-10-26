@@ -1,0 +1,93 @@
+@import 'tailwindcss' source('../');
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  --font-sans: var(--font-inter), Arial, sans-serif;
+  --color-app: var(--app);
+  --color-navigation: var(--navigation);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-hover: var(--hover);
+  --color-navigation-selected: var(--navigation-selected);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-border: var(--accent-border);
+  --color-separator: var(--separator);
+  --color-border: var(--border);
+  --color-success: var(--success);
+  --color-warning-foreground: var(--warning-foreground);
+  --radius-workspace: 21px;
+  --radius-panel: 17px;
+  --radius-control: 11px;
+  --radius-badge: 7px;
+  --radius-checkbox: 5px;
+}
+
+:root {
+  color-scheme: light;
+  --app: #eff0f2;
+  --navigation: #f0f1f3;
+  --background: #ffffff;
+  --foreground: #282c34;
+  --muted: #f7f8fa;
+  --muted-foreground: #6b7380;
+  --secondary-foreground: #535d6c;
+  --hover: #f1f3f6;
+  --navigation-selected: #e2e5e9;
+  --primary: #3774c4;
+  --primary-hover: #2d65ad;
+  --primary-foreground: #ffffff;
+  --accent: #edf4fd;
+  --accent-foreground: #282c34;
+  --accent-border: #d5e4f9;
+  --separator: #e9ebef;
+  --border: #e2e5ea;
+  --success: #62927d;
+  --warning-foreground: #946137;
+}
+
+.dark {
+  color-scheme: dark;
+  --app: #17181b;
+  --navigation: #1c1d21;
+  --background: #212226;
+  --foreground: #f0f1f3;
+  --muted: #27292e;
+  --muted-foreground: #a3a9b5;
+  --secondary-foreground: #c0c5cf;
+  --hover: #2c2e34;
+  --navigation-selected: #34363c;
+  --primary: #81adea;
+  --primary-hover: #9bbdf0;
+  --primary-foreground: #172334;
+  --accent: #29394e;
+  --accent-foreground: #f0f1f3;
+  --accent-border: #3c5575;
+  --separator: #303239;
+  --border: #3a3d45;
+  --success: #91bca3;
+  --warning-foreground: #d4aa7e;
+}
+
+@layer base {
+  body {
+    margin: 0;
+    background: var(--app);
+    color: var(--foreground);
+    font-family: var(--font-inter), Arial, sans-serif;
+    font-optical-sizing: auto;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
+  }
+}
