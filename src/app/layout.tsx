@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { themeInitializationScript } from '@/lib/theme';
 import type { ReactNode } from 'react';
 import localFont from 'next/font/local';
 import '@fortawesome/fontawesome-svg-core/styles.css';
@@ -18,7 +19,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="ru" className={inter.variable}>
+    <html lang="ru" className={inter.variable} suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{ __html: themeInitializationScript }}
+        />
+      </head>
       <body>{children}</body>
     </html>
   );

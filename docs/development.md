@@ -15,23 +15,23 @@ Pro/Rounded assets are not included. Inter Variable is local, with its license.
 
 ## Directory boundaries
 
-| Path                                                                   | Responsibility                                                                 |
-| ---------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| `src/app`                                                              | Next.js routes, root layout, global tokens; currently only the foundation page |
-| `src/features/{today,subjects,tasks,planner,focus,analytics,settings}` | Feature UI and local commands/queries when implemented                         |
-| `src/domain`                                                           | Pure business rules and contracts, without React or storage                    |
-| `src/components/ui`                                                    | Selective accessible shadcn/ui primitives                                      |
-| `src/lib/env`                                                          | Validated public environment and server-only secret access                     |
-| `src/lib/{supabase,sync,i18n}`                                         | Future infrastructure and locale dictionaries                                  |
-| `src/assets/fonts`                                                     | Licensed local Inter Variable asset                                            |
-| `public`                                                               | Future static assets; no service worker yet                                    |
-| `supabase/migrations`                                                  | Future SQL migrations; no invented schema or generated types                   |
-| `supabase/tests`                                                       | Future pgTAP ownership, RLS, transaction, and concurrency tests                |
-| `tests/integration`                                                    | Future storage/sync boundary tests                                             |
-| `tests/e2e`                                                            | Browser checks against a production build                                      |
+| Path                                                                   | Responsibility                                                                                      |
+| ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `src/app`                                                              | Next.js routes, root layout, global tokens; static application shell and labeled temporary sections |
+| `src/features/{today,subjects,tasks,planner,focus,analytics,settings}` | Feature UI and local commands/queries when implemented                                              |
+| `src/domain`                                                           | Pure business rules and contracts, without React or storage                                         |
+| `src/components/ui`                                                    | Selective accessible shadcn/ui primitives                                                           |
+| `src/lib/env`                                                          | Validated public environment and server-only secret access                                          |
+| `src/lib/{supabase,sync,i18n}`                                         | Future infrastructure and locale dictionaries                                                       |
+| `src/assets/fonts`                                                     | Licensed local Inter Variable asset                                                                 |
+| `public`                                                               | Future static assets; no service worker yet                                                         |
+| `supabase/migrations`                                                  | Future SQL migrations; no invented schema or generated types                                        |
+| `supabase/tests`                                                       | Future pgTAP ownership, RLS, transaction, and concurrency tests                                     |
+| `tests/integration`                                                    | Future storage/sync boundary tests                                                                  |
+| `tests/e2e`                                                            | Browser checks against a production build                                                           |
 
 Reserved directories use `.gitkeep`; they do not expose API endpoints or imply
-working features. Create auth, `/app`, API, proxy, and service-worker files only
+working features. The `/app` shell now exists. Create auth, API, proxy, and service-worker files only
 when implementing their approved behavior. Do not add repositories, service classes,
 state frameworks, or an ORM.
 
@@ -68,8 +68,9 @@ are fabricated for this stage. Generate database types from actual migrations la
 
 Vitest uses Node with `@/*` aliases. Add a browser-like environment or IndexedDB
 shim only when a real integration test needs it. Current unit coverage verifies
-missing/unsafe environment rejection and the public/private boundary. E2E verifies
-HTTP success, rendered content, runtime errors, and viewport overflow without auth.
+missing/unsafe environment rejection and the public/private boundary. E2E verifies all seven navigation states, URL/history behavior without RSC requests,
+drawer/search keyboard interaction, theme persistence/system changes/storage errors,
+unknown views, skip links, and responsive widths without auth.
 Use meaningful behavior tests; do not test duplicate copies of implementation logic.
 
 ESLint uses Next's flat configuration plus strict `no-explicit-any`; Prettier handles
@@ -109,3 +110,20 @@ The foundation follows the official [Next manual installation](https://nextjs.or
 [shadcn manual setup](https://ui.shadcn.com/docs/installation/manual), and
 [Supabase local configuration](https://supabase.com/docs/guides/local-development/cli/config).
 The approved StudyFlow tokens override generic component defaults.
+
+## Application shell
+
+`src/components/app-shell.tsx` owns presentation/navigation state; section metadata
+lives in `src/lib/navigation.ts`. `useSearchParams` observes native History API
+changes within one statically generated `/app` route. Do not replace section links
+with server navigation or add cookie checks to that generic entry point.
+
+`PageHeader`/`PageContent`, `Button`, `Input`, `Dialog`, `LoadingState`, and `ErrorState`
+are reusable primitives. Native modal dialogs provide inert background/focus return;
+explicit Escape and Tab boundaries cover search-input/browser behavior. No dialog
+dependency or generic component factory was added. Search finds sections only.
+
+The theme initialization function is self-contained and shared with the before-paint
+script. A future restrictive CSP must authorize that script using the chosen hash/nonce
+policy; do not silently remove the script and reintroduce a theme flash. No user input
+is interpolated into it. Only the theme preference is stored; no account data exists.

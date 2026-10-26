@@ -2,7 +2,7 @@
 
 Study planning and learning progress for students. Requirements, architecture,
 design system, references, roadmap, and the Today specification are approved.
-This repository currently contains the project foundation, not application features.
+The application shell is implemented; study features are not implemented yet.
 
 ## Local setup
 
@@ -13,8 +13,11 @@ npm ci
 npm run dev
 ```
 
-Open http://localhost:3000. The neutral foundation page works without Supabase
-credentials. No auth, study data, offline cache, or synchronization is implemented yet.
+Open http://localhost:3000/app. The root URL redirects there. Navigation uses
+`/app?view=today` (also subjects, tasks, planner, focus, analytics, settings).
+Pages are explicitly temporary. Sidebar/drawer, navigation search (Ctrl/Cmd+K),
+and system/light/dark themes work without Supabase credentials.
+No auth, study data, offline cache, or synchronization is implemented yet.
 
 For later backend work, copy `.env.example` to `.env.local` and fill it using a
 **development** Supabase project or the local CLI. Never commit `.env.local`.

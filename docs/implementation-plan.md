@@ -1,6 +1,6 @@
 # StudyFlow — поэтапный план
 
-Status: **Approved roadmap 1.0; Stage 4 foundation initialized**. The user explicitly approved requirements, architecture, design system, reference mapping, implementation roadmap, and Today v1.0. Product feature implementation has not started; no release date is committed.
+Status: **Approved roadmap 1.0; Stage 5 Milestone 1 — Application Foundation implemented and verified**. The user explicitly approved requirements, architecture, design system, reference mapping, implementation roadmap, and Today v1.0. The user explicitly authorized the reusable application shell before business features; no release date is committed.
 
 ## Этапы и согласования
 
@@ -10,7 +10,7 @@ Status: **Approved roadmap 1.0; Stage 4 foundation initialized**. The user expli
 | 2. Architecture | architecture.md, decisions.md, implementation roadmap | Approved by the user |
 | 3. Design system and UX | Reference analysis, two directions, flows, page specifications, tokens, responsive states | Approved by the user, including Today v1.0; detailed specifications for other pages remain to be written before their implementation |
 | 4. Инициализация | Минимальный воспроизводимый проект | Foundation initialized; checks recorded in docs/initialization.md; local DB execution requires Docker |
-| 5. Инкрементальная реализация | Рабочие сценарии по таблице ниже | После проверки основы проекта |
+| 5. Инкрементальная реализация | Рабочие сценарии по таблице ниже | Application Foundation completed; functional increments not started |
 | 6. Визуальный обзор | Реальные экраны и исправления | Отдельный итоговый этап; текущая визуальная проверка в каждом инкременте |
 | 7. Технический обзор | Корректность, безопасность, эксплуатация, ограничения | До первого реального использования |
 
@@ -35,13 +35,23 @@ Status: **Approved roadmap 1.0; Stage 4 foundation initialized**. The user expli
 The approved stack, strict TypeScript, lint/format, environment validation, directory
 boundaries, Vitest, Playwright, local Supabase configuration, and permanent AGENTS.md
 are in place. See [development guide](development.md) and [verification record](initialization.md).
-Only a neutral foundation page is implemented. No product features, auth routes,
+The application shell and labeled temporary sections are implemented. No business features, auth routes,
 schema migrations, synchronization engine, service worker, or hosted project exist.
 Hosting/region/plan, SMTP, and backup/deletion retention are deferred to deployment
 preflight; local database execution remains unverified while Docker is stopped.
-Stage 5 has not started.
+Stage 5 has started with the user-directed Application Foundation milestone. Business features have not started.
 
-## Этап 5 — инкременты
+## Stage 5 — user-directed Milestone 1: Application Foundation
+
+The user explicitly requested the reusable shell before the functional increments
+below. Implement `/app?view=...`, seven-section navigation, responsive desktop/sidebar
+and mobile drawer, header/title primitives, themes, accessible navigation search,
+and shared loading/error patterns. Use clearly labeled temporary page shells.
+No authentication, study data, offline engine, or synchronization is included.
+This changes implementation order only; the approved architecture is unchanged.
+See [milestone record](milestone-1.md). Stop after this milestone.
+
+## Этап 5 — последующие функциональные инкременты
 
 | № | Рабочий результат | Проверка перед продолжением |
 | --- | --- | --- |
@@ -76,4 +86,4 @@ Stage 5 has not started.
 - Зафиксировать browsers и ограничения хранения/фоновых уведомлений/удалённого стирания.
 - Короткий релизный отчёт: рабочие сценарии, проведённые проверки, ограничения. Внешняя публикация — по отдельной команде владельца.
 
-Next action: review and approve the Today UX/visual contract in docs/page-specifications.md, including the simplified context rail and daily-progress definitions. Record explicit approval of each detailed design result before implementation; the shared direction has already been selected. Implementation remains blocked until explicit design approval.
+Next action: stop after the implemented and verified Application Foundation milestone; await the next explicit scope. Today v1.0 is already approved. Other detailed page specifications must be defined before those pages are implemented; do not infer authorization for the functional increments above.

@@ -59,3 +59,17 @@ mapping, implementation roadmap, and the Today specification before authorizing
 Stage 4. The standalone HTML remains a supporting review artifact; the approved
 Today contract prioritizes the daily plan and next action over dashboard widgets.
 Other pages do not yet have detailed page specifications in this document.
+
+## Application foundation tokens
+
+The shell implements this palette in `src/app/globals.css`, with shared spacing
+variables for 4/8/12/16/20/24/32/40 px and explicit page/navigation/body/meta type roles.
+Required input boundaries use `input-border`: #8B929E light / #747C89 dark
+(3.13:1 / 3.77:1 against the respective primary surface). Error text uses `danger`:
+#B13C3C light / #EFA0A0 dark (5.86:1 / 7.72:1). These functional tokens fill the
+existing accessibility requirement; decorative separator colors remain unchanged.
+
+Theme options are System, Light, and Dark. Appearance is applied before paint and
+persisted locally. Hover transitions are suppressed during the theme change to avoid
+mixed-theme frames; a storage failure keeps the current selection and reports that
+it could not be saved. This is appearance persistence, not offline study support.
