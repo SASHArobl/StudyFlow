@@ -6,6 +6,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { config } from '@fortawesome/fontawesome-svg-core';
 import { faBars, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { getSection, sectionHref } from '@/lib/navigation';
+import type { Profile } from '@/domain/auth';
+import { AccountSettings } from '@/features/account/account-settings';
 import { Sidebar, type NavigateHandler } from './sidebar';
 import { NavigationSearch } from './navigation-search';
 import { PageContent, PageHeader, PagePlaceholder } from './page-layout';
@@ -21,7 +23,17 @@ const getShortcut = () =>
   /Mac|iPhone|iPad/.test(navigator.userAgent) ? '⌘ K' : 'Ctrl K';
 const getServerShortcut = () => 'Ctrl K';
 
-export function AppShell() {
+export function AppShell({
+  profile,
+  onProfileUpdate,
+  onSignOut,
+  signingOut,
+}: {
+  profile: Profile;
+  onProfileUpdate: (profile: Profile) => void;
+  onSignOut: () => void;
+  signingOut: boolean;
+}) {
   const searchParams = useSearchParams();
   const section = getSection(searchParams.get('view'));
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -150,6 +162,9 @@ export function AppShell() {
             </span>
             <span className="breadcrumb-current">{title}</span>
           </div>
+          <Button variant="ghost" onClick={onSignOut} disabled={signingOut}>
+            {signingOut ? 'Выход…' : 'Выйти'}
+          </Button>
           <Button
             variant="ghost"
             size="icon"
@@ -167,7 +182,9 @@ export function AppShell() {
               description={section?.description}
               titleRef={titleRef}
             />
-            {section ? (
+            {section?.id === 'settings' ? (
+              <AccountSettings profile={profile} onUpdate={onProfileUpdate} />
+            ) : section ? (
               <PagePlaceholder />
             ) : (
               <ErrorState

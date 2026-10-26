@@ -1,129 +1,108 @@
-# Development foundation
+# Development guide
 
-## Runtime and dependencies
+## Runtime and conventions
 
-Use Node.js 24 LTS and npm 11; the exact local runtime is in `.nvmrc`.
-`package-lock.json` is the reproducible dependency source: use `npm ci` on a fresh
-checkout. Direct versions are pinned. Dependency updates are deliberate changes.
+Use Node.js 24 LTS and npm 11 (`.nvmrc`, pinned package-lock.json). Run `npm ci`
+on a fresh checkout. The approved stack remains Next.js App Router, React, strict
+TypeScript, Tailwind, Zod, Supabase SSR/JS and later Dexie offline storage.
+No dependencies were added for authentication. Use the existing source-owned UI
+primitives, local Inter Variable and genuine Font Awesome Free icons.
 
-The foundation uses Next.js App Router, React, strict TypeScript, Tailwind CSS,
-Zod, official Supabase JS/SSR packages, Dexie, and Dexie React hooks.
-shadcn/ui is source-owned: `components.json` and `cn` are configured; add only
-needed primitives in their implementation increment. No component kit or generated
-product pages are installed. Use genuine Font Awesome Free Regular/Classic Solid;
-Pro/Rounded assets are not included. Inter Variable is local, with its license.
+- `src/app`: routes, HTTP boundaries, global tokens and generic static `/app`.
+- `src/domain`: pure validation/contracts; no React or infrastructure.
+- `src/features/auth`, `src/features/account`: authentication and profile UI.
+- `src/components`: reusable shell, navigation and accessible UI primitives.
+- `src/lib/supabase`: request-scoped server client, verified-user helper and generated DB types.
+- `supabase/migrations`, `supabase/tests`: real schema/RPC migrations and pgTAP tests.
+- `tests/e2e`: production-build browser tests against local Supabase and Mailpit.
 
-## Directory boundaries
+Reserved directories are placeholders, not completed features. Do not add an ORM,
+repository classes, generic services or state frameworks without a demonstrated need.
 
-| Path                                                                   | Responsibility                                                                                      |
-| ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `src/app`                                                              | Next.js routes, root layout, global tokens; static application shell and labeled temporary sections |
-| `src/features/{today,subjects,tasks,planner,focus,analytics,settings}` | Feature UI and local commands/queries when implemented                                              |
-| `src/domain`                                                           | Pure business rules and contracts, without React or storage                                         |
-| `src/components/ui`                                                    | Selective accessible shadcn/ui primitives                                                           |
-| `src/lib/env`                                                          | Validated public environment and server-only secret access                                          |
-| `src/lib/{supabase,sync,i18n}`                                         | Future infrastructure and locale dictionaries                                                       |
-| `src/assets/fonts`                                                     | Licensed local Inter Variable asset                                                                 |
-| `public`                                                               | Future static assets; no service worker yet                                                         |
-| `supabase/migrations`                                                  | Future SQL migrations; no invented schema or generated types                                        |
-| `supabase/tests`                                                       | Future pgTAP ownership, RLS, transaction, and concurrency tests                                     |
-| `tests/integration`                                                    | Future storage/sync boundary tests                                                                  |
-| `tests/e2e`                                                            | Browser checks against a production build                                                           |
+## Local setup
 
-Reserved directories use `.gitkeep`; they do not expose API endpoints or imply
-working features. The `/app` shell now exists. Create auth, API, proxy, and service-worker files only
-when implementing their approved behavior. Do not add repositories, service classes,
-state frameworks, or an ORM.
+1. Start Docker (Colima works), then `npm run db:start`. Auth requires the database,
+   Auth, REST, gateway and Mailpit services. On a small machine, the verified reduced
+   command is `npx supabase start --exclude studio,postgres-meta,realtime,storage-api,imgproxy,edge-runtime,logflare,vector,supavisor`.
+2. Copy `.env.example` to untracked `.env.local`. Read local connection values with
+   `npx supabase status`; never paste its secret output into logs or issues.
+3. Set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` and the
+   exact canonical `APP_ORIGIN=http://127.0.0.1:3000` (no trailing slash).
+   Authentication uses no secret/service-role key.
+4. Run `npm run dev`, then open `http://127.0.0.1:3000`. The browser origin must
+   match APP_ORIGIN. Local email is available at `http://127.0.0.1:54324`.
 
-## Environment
+Next loads `.env.local`; existing process variables take precedence. Public values
+are bundled at build time; rebuild after changing them. Environment validation is
+lazy so the generic static shell can build without backend configuration. Missing
+configuration fails safely at runtime. `getSupabaseSecretKey()` remains reserved
+for the later account-deletion implementation.
 
-`.env.example` contains empty placeholders. Next.js loads `.env.local` automatically;
-existing process variables take precedence. `NEXT_PUBLIC_*` values are bundled at
-build time and are public. Rebuild after changing them. Private keys belong only
-in untracked local files or the deployment secret store.
+Local Supabase exposes only `api`. User tables in `app_data` and service tables in
+`private` have forced RLS and no client DML grants. RPCs verify active Auth sessions
+and own rows. See [authentication contract](authentication.md) for the narrow role,
+Auth-table RLS policies and request/cookie boundaries.
 
-`getPublicEnv()` validates only when called; the static foundation must build
-without backend configuration. It accepts HTTPS (or HTTP loopback for local work)
-and a publishable key, strips unknown fields, and never substitutes fake values.
-`getSupabaseSecretKey()` is guarded by `server-only`; use it only for the future
-approved administrative account-deletion operation. Missing/invalid configuration
-throws a sanitized error; never print raw credentials or validation input.
+## Commands and verification
 
-No Supabase clients, auth/session handling, database types, or application schema
-are fabricated for this stage. Generate database types from actual migrations later.
+| Command                                                                        | Purpose                                                              |
+| ------------------------------------------------------------------------------ | -------------------------------------------------------------------- |
+| `npm run check`                                                                | ESLint, formatting, strict TypeScript and unit tests                 |
+| `npm run build` / `npm start`                                                  | Production build/server                                              |
+| `npm run test:e2e`                                                             | Production-build desktop and mobile Chromium tests                   |
+| `npm run test:db`                                                              | Local pgTAP isolation, grants, RLS, versions and session checks      |
+| `npx supabase db lint --local --schema api,private,app_data --fail-on warning` | SQL function checks                                                  |
+| `npm run db:stop`                                                              | Stop the local Supabase stack                                        |
+| `npx supabase gen types --local --schema api`                                  | Regenerate database.types.ts from the real schema; format its output |
 
-## Commands and tests
+E2E requires local Supabase and Mailpit, refuses hosted Supabase URLs, and creates
+unique test-only accounts. Its server overrides APP_ORIGIN to port 3100, which is
+allowlisted in local Auth configuration. Confirmation links stay in the browser
+that initiated PKCE. Tests do not bypass authorization or use admin credentials.
+Traces contain synthetic test credentials/sessions; keep ignored test-results
+private and never run these fixtures against real users.
 
-| Command                                | Purpose                                                                  |
-| -------------------------------------- | ------------------------------------------------------------------------ |
-| `npm run dev`                          | Local Next development server                                            |
-| `npm run check`                        | ESLint, formatting, strict typecheck, Vitest                             |
-| `npm run build` / `npm start`          | Production build / server                                                |
-| `npm run lint:fix` / `npm run format`  | Focused code style repair; review changes                                |
-| `npm run test:watch`                   | Unit test watch mode                                                     |
-| `npx playwright install chromium`      | Install the browser needed by E2E tests                                  |
-| `npm run test:e2e`                     | Build and launch production app; desktop and mobile Chromium smoke tests |
-| `npm run db:start` / `npm run db:stop` | Start / stop the local Supabase stack; requires Docker                   |
-| `npm run test:db`                      | Run pgTAP tests after the first real migration and SQL tests exist       |
+ESLint's Next preset currently requires ESLint 9 and TypeScript below 6.1; keep the
+pinned versions until their declared peer ranges change together. Formatting skips
+approved historical design/architecture artifacts to preserve their review history.
+`next typegen` runs before strict TypeScript checks.
 
-Vitest uses Node with `@/*` aliases. Add a browser-like environment or IndexedDB
-shim only when a real integration test needs it. Current unit coverage verifies
-missing/unsafe environment rejection and the public/private boundary. E2E verifies all seven navigation states, URL/history behavior without RSC requests,
-drawer/search keyboard interaction, theme persistence/system changes/storage errors,
-unknown views, skip links, and responsive widths without auth.
-Use meaningful behavior tests; do not test duplicate copies of implementation logic.
+## Shell and themes
 
-ESLint uses Next's flat configuration plus strict `no-explicit-any`; Prettier handles
-formatting separately. Existing approved design/architecture artifacts are excluded
-from bulk formatting to preserve their review history. Format new source/config/docs.
-TypeScript is strict with unchecked index access. The typecheck command first runs
-`next typegen`, so a fresh checkout does not depend on a pre-existing `.next` build.
-Next generated types stay generated.
-The Next ESLint preset currently requires TypeScript below 6.1 and plugins accepting
-ESLint 9. Pin TypeScript 6.0.3 and ESLint 9.39.5 rather than overriding peer ranges.
-ESLint 9 is deprecated upstream; upgrade the preset/plugins and ESLint together once
-their declared ranges support ESLint 10. Installation currently reports no known
-vulnerabilities; deprecation is tracked separately from the audit result.
+`/app?view=...` stays a generic static document without cookies or personal HTML.
+AuthenticatedWorkspace obtains the profile through a server-authenticated endpoint;
+all data RPCs independently enforce authorization. Navigation uses native History
+API and does not make document/RSC requests between sections. Study sections remain
+clearly labeled temporary pages; Settings now includes the real basic profile.
 
-## Local Supabase
+Reuse Button, Input, Dialog, LoadingState, ErrorState, PageHeader and PageContent.
+The auth forms reuse ThemeSwitcher and its system/storage listeners. The shared
+before-paint theme script requires a hash/nonce if a restrictive CSP is introduced.
+Do not remove it or interpolate user data into it.
 
-The CLI is a pinned dev dependency; `supabase/config.toml` is local-only configuration.
-It does not create a hosted project. Run Docker first, then `npm run db:start`.
-Read `npx supabase status` locally for development connection values; never paste
-secret output into issues or logs. Auth redirect origins use localhost:3000.
+## Hosted setup remains a separate step
 
-The product's narrow `api` RPC schema must be exposed only once it exists in a
-migration; the initial empty local database exposes no application schema. Do not
-create placeholder RPCs or permissive public tables to make initialization look done.
-No schema test success is claimed before real SQL tests and a running database exist.
+No cloud project was created or modified. Before production, apply the migration,
+expose only `api`, configure trusted HTTPS APP_ORIGIN, matching Auth redirect URLs,
+real SMTP, email templates and production rate limits. Verify confirmation/recovery
+through real email clients, including prefetch/link scanners and supported browsers.
+Local Mailpit delivery is not proof of production deliverability. Review region,
+backups and deletion retention before real use. See [Milestone 2](milestone-2.md).
 
-## Next increment
+## Registration troubleshooting
 
-Follow the approved roadmap: email/password authentication and ownership rules first.
-Hosting region/plan, SMTP, backup retention, and deletion retention remain deployment
-choices requiring actual infrastructure context; no production deployment is included.
+If registration reports an unavailable service, first verify that the process on
+port 3000 is the current application. A running `next start` process retains its
+route manifest even when another build replaces `.next`; restart that process
+after an implementation/build change. Do not run dev and production servers
+against the same build directory concurrently.
 
-## Setup references
+Use the canonical APP_ORIGIN URL. With the supplied local environment this is
+`http://127.0.0.1:3000`, not `http://localhost:3000`. A mismatched Origin is correctly
+rejected with 403; do not weaken the CSRF check to work around it. The UI now
+distinguishes this configuration mismatch from a Supabase outage.
 
-The foundation follows the official [Next manual installation](https://nextjs.org/docs/app/getting-started/installation),
-[Tailwind PostCSS setup](https://tailwindcss.com/docs/installation/using-postcss),
-[shadcn manual setup](https://ui.shadcn.com/docs/installation/manual), and
-[Supabase local configuration](https://supabase.com/docs/guides/local-development/cli/config).
-The approved StudyFlow tokens override generic component defaults.
-
-## Application shell
-
-`src/components/app-shell.tsx` owns presentation/navigation state; section metadata
-lives in `src/lib/navigation.ts`. `useSearchParams` observes native History API
-changes within one statically generated `/app` route. Do not replace section links
-with server navigation or add cookie checks to that generic entry point.
-
-`PageHeader`/`PageContent`, `Button`, `Input`, `Dialog`, `LoadingState`, and `ErrorState`
-are reusable primitives. Native modal dialogs provide inert background/focus return;
-explicit Escape and Tab boundaries cover search-input/browser behavior. No dialog
-dependency or generic component factory was added. Search finds sections only.
-
-The theme initialization function is self-contained and shared with the before-paint
-script. A future restrictive CSP must authorize that script using the chosen hash/nonce
-policy; do not silently remove the script and reintroduce a theme flash. No user input
-is interpolated into it. Only the theme preference is stored; no account data exists.
+On 2026-10-26, the stale server returned 404 for `/api/auth/register`. After
+restarting the current dev server, a real browser registration returned 200,
+Mailpit received its confirmation email, and the callback opened the protected
+workspace. This verifies the local flow, not production email delivery.

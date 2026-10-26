@@ -5,8 +5,8 @@ project_id = "studyflow"
 [api]
 enabled = true
 port = 54321
-# Empty public schema until migrations create the approved narrow api RPC schema.
-schemas = ["public"]
+# Expose only fixed RPCs; user-owned tables remain private.
+schemas = ["api"]
 extra_search_path = ["extensions"]
 max_rows = 1000
 auto_expose_new_tables = false
@@ -47,13 +47,17 @@ additional_redirect_urls = [
   "http://127.0.0.1:3000/auth/confirm",
   "http://localhost:3000/reset-password",
   "http://127.0.0.1:3000/reset-password",
+  "http://localhost:3000/auth/confirm?flow=recovery",
+  "http://127.0.0.1:3000/auth/confirm?flow=recovery",
+  "http://127.0.0.1:3100/auth/confirm",
+  "http://127.0.0.1:3100/auth/confirm?flow=recovery",
 ]
 jwt_expiry = 900
 enable_refresh_token_rotation = true
 refresh_token_reuse_interval = 10
 enable_signup = true
 enable_anonymous_sign_ins = false
-minimum_password_length = 8
+minimum_password_length = 12
 
 [auth.email]
 enable_signup = true
@@ -66,3 +70,8 @@ enabled = false
 
 [analytics]
 enabled = false
+
+# Local development/test limits; review hosted limits separately before production.
+[auth.rate_limit]
+email_sent = 200
+sign_in_sign_ups = 200

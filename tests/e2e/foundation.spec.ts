@@ -11,6 +11,7 @@ const sections = [
 ] as const;
 
 async function openNavigation(page: Page) {
+  await expect(page.locator('.workspace')).toBeVisible();
   const trigger = page.getByRole('button', {
     name: 'Открыть навигацию',
     exact: true,
@@ -27,6 +28,14 @@ async function navigate(page: Page, label: string) {
 }
 
 test.beforeEach(async ({ page }) => {
+  const response = await page.request.post('/api/auth/login', {
+    headers: { Origin: 'http://127.0.0.1:3100' },
+    data: {
+      email: process.env.STUDYFLOW_TEST_EMAIL,
+      password: process.env.STUDYFLOW_TEST_PASSWORD,
+    },
+  });
+  expect(response.ok()).toBe(true);
   await page.goto('/app');
   await expect(
     page.getByRole('heading', { name: 'Сегодня', exact: true }),
@@ -55,9 +64,14 @@ test('all seven sections navigate without document or RSC requests', async ({
     await expect(
       page.locator('.desktop-sidebar a[aria-current="page"]'),
     ).toHaveText(label);
-    await expect(
-      page.getByText('Временная страница', { exact: true }),
-    ).toBeVisible();
+    if (id !== 'settings')
+      await expect(
+        page.getByText('Временная страница', { exact: true }),
+      ).toBeVisible();
+    else
+      await expect(
+        page.getByRole('heading', { name: 'Профиль', exact: true }),
+      ).toBeVisible();
     await expect(page).toHaveTitle(`${label} · StudyFlow`);
   }
   expect(requests).toEqual([]);

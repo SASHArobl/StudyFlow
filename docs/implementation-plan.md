@@ -1,6 +1,6 @@
 # StudyFlow — поэтапный план
 
-Status: **Approved roadmap 1.0; Stage 5 Milestone 1 — Application Foundation implemented and verified**. The user explicitly approved requirements, architecture, design system, reference mapping, implementation roadmap, and Today v1.0. The user explicitly authorized the reusable application shell before business features; no release date is committed.
+Status: **Approved roadmap 1.0; Stage 5 Milestones 1–2 — Application Foundation and Authentication implemented and verified**. The user explicitly approved requirements, architecture, design system, reference mapping, implementation roadmap, and Today v1.0. The user explicitly authorized the reusable application shell before business features; no release date is committed.
 
 ## Этапы и согласования
 
@@ -10,7 +10,7 @@ Status: **Approved roadmap 1.0; Stage 5 Milestone 1 — Application Foundation i
 | 2. Architecture | architecture.md, decisions.md, implementation roadmap | Approved by the user |
 | 3. Design system and UX | Reference analysis, two directions, flows, page specifications, tokens, responsive states | Approved by the user, including Today v1.0; detailed specifications for other pages remain to be written before their implementation |
 | 4. Инициализация | Минимальный воспроизводимый проект | Foundation initialized; checks recorded in docs/initialization.md; local DB execution requires Docker |
-| 5. Инкрементальная реализация | Рабочие сценарии по таблице ниже | Application Foundation completed; functional increments not started |
+| 5. Инкрементальная реализация | Рабочие сценарии по таблице ниже | Application Foundation and Authentication/User Profiles completed; remaining functional increments not started |
 | 6. Визуальный обзор | Реальные экраны и исправления | Отдельный итоговый этап; текущая визуальная проверка в каждом инкременте |
 | 7. Технический обзор | Корректность, безопасность, эксплуатация, ограничения | До первого реального использования |
 
@@ -35,11 +35,11 @@ Status: **Approved roadmap 1.0; Stage 5 Milestone 1 — Application Foundation i
 The approved stack, strict TypeScript, lint/format, environment validation, directory
 boundaries, Vitest, Playwright, local Supabase configuration, and permanent AGENTS.md
 are in place. See [development guide](development.md) and [verification record](initialization.md).
-The application shell and labeled temporary sections are implemented. No business features, auth routes,
-schema migrations, synchronization engine, service worker, or hosted project exist.
+The application shell, authentication routes, basic profile, private schema/RPC migration and tests are implemented.
+Study features, synchronization engine, service worker and hosted project are not implemented.
 Hosting/region/plan, SMTP, and backup/deletion retention are deferred to deployment
-preflight; local database execution remains unverified while Docker is stopped.
-Stage 5 has started with the user-directed Application Foundation milestone. Business features have not started.
+preflight. Local Supabase Auth, Mailpit and SQL/RLS checks have now run; see milestone-2.md.
+Stage 5 has completed user-directed Milestones 1–2. Study business features have not started.
 
 ## Stage 5 — user-directed Milestone 1: Application Foundation
 
@@ -50,6 +50,14 @@ and shared loading/error patterns. Use clearly labeled temporary page shells.
 No authentication, study data, offline engine, or synchronization is included.
 This changes implementation order only; the approved architecture is unchanged.
 See [milestone record](milestone-1.md). Stop after this milestone.
+
+## Stage 5 — user-directed Milestone 2: Authentication and User Profiles
+
+Email/password registration, confirmation, sign-in/out, PKCE recovery, SSR cookie
+sessions and basic owned profiles are implemented. The generic `/app` entry stays
+static; protected endpoints and narrow RLS-backed RPCs enforce access separately.
+See [authentication contract](authentication.md) and [verification record](milestone-2.md).
+No study features, offline identity/storage, sync or hosted deployment are included.
 
 ## Этап 5 — последующие функциональные инкременты
 
@@ -86,4 +94,4 @@ See [milestone record](milestone-1.md). Stop after this milestone.
 - Зафиксировать browsers и ограничения хранения/фоновых уведомлений/удалённого стирания.
 - Короткий релизный отчёт: рабочие сценарии, проведённые проверки, ограничения. Внешняя публикация — по отдельной команде владельца.
 
-Next action: stop after the implemented and verified Application Foundation milestone; await the next explicit scope. Today v1.0 is already approved. Other detailed page specifications must be defined before those pages are implemented; do not infer authorization for the functional increments above.
+Next action: stop after the implemented and verified Authentication/User Profiles milestone; await approval before the next explicit scope. Today v1.0 is already approved. Other detailed page specifications must be defined before those pages are implemented; do not infer authorization for the functional increments above.

@@ -762,3 +762,129 @@
 .theme-updating *::after {
   transition: none !important;
 }
+
+@layer components {
+  .auth-layout {
+    min-height: 100dvh;
+    display: grid;
+    place-items: center;
+    padding: 32px 20px;
+    background: var(--app);
+  }
+  .auth-panel {
+    width: 100%;
+    max-width: 408px;
+    padding: 32px;
+    border-radius: var(--radius-panel);
+    background: var(--background);
+    border: 1px solid var(--border);
+  }
+  .auth-brand {
+    display: inline-block;
+    margin-bottom: 32px;
+    font-size: 16px;
+    font-weight: 650;
+    color: var(--foreground);
+    text-decoration: none;
+  }
+  .auth-panel h1 {
+    font-size: 24px;
+    line-height: 1.25;
+    font-weight: 620;
+    letter-spacing: -0.6px;
+  }
+  .auth-description {
+    margin: 12px 0 28px;
+    color: var(--secondary-foreground);
+    line-height: 1.5;
+  }
+  .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .form-field label {
+    font-size: 13px;
+    font-weight: 550;
+  }
+  .form-field .input {
+    width: 100%;
+    min-height: 44px;
+  }
+  .form-hint {
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--secondary-foreground);
+  }
+  .field-error {
+    color: var(--danger);
+    font-size: 13px;
+    line-height: 1.5;
+    margin-bottom: 12px;
+  }
+  .input[aria-invalid='true'] {
+    border-color: var(--danger);
+  }
+  .auth-submit {
+    width: 100%;
+    min-height: 44px;
+    margin-top: 4px;
+  }
+  .auth-links {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 24px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--secondary-foreground);
+  }
+  .auth-links a,
+  .auth-notice a {
+    color: var(--primary);
+    text-underline-offset: 3px;
+  }
+  .auth-notice {
+    padding: 16px;
+    margin-bottom: 24px;
+    border-radius: var(--radius-control);
+    background: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .auth-notice a {
+    display: inline-block;
+    margin-top: 12px;
+  }
+  .account-settings {
+    margin-top: var(--space-8);
+    max-width: 480px;
+  }
+  .account-settings h2 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 24px;
+  }
+  .account-settings form > [role='status'] {
+    margin-bottom: 16px;
+  }
+  @media (max-width: 479px) {
+    .auth-layout {
+      padding: 24px 16px;
+      align-items: start;
+      padding-top: 64px;
+    }
+    .auth-panel {
+      padding: 24px;
+    }
+  }
+}
+
+@layer components {
+  .auth-theme {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--separator);
+  }
+}
